@@ -1,0 +1,39 @@
+# -*- mode: org -*-
+# -*- coding: utf-8 -*-
+#+TITLE: Primary Configuration File
+#+AUTHOR: Evan Wilde
+#+EMAIL: etcwilde@uvic.ca
+#+DRAWERS: HIDDEN STATE
+#+CATEGORY: Configuration
+#+PROPERTY: tangle `(concat etcw-el-root-directory "etcw/config.el")`
+#+PROPERTY: header-args:C++ :results output :flags -std=c++14 -Wall --pedantic -Werror
+#+PROPERTY: header-args:R   :results output :colnames yes
+
+This file is for personal configuratoin
+
+* Environment Behaviour
+
+Prefer y-n versus yes-no
+
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+Disable bell
+
+#+BEGIN_SRC emacs-lisp
+(setq visible-bell t)
+#+END_SRC
+
+Disable spash screen
+
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-startup-screen t)
+#+END_SRC
+
+* Text Editing Configuration
+
+End sentences with a single space
+#+BEGIN_SRC emacs-lisp
+(setq sentence-end-double-space nil)
+#+END_SRC

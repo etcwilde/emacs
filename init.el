@@ -23,5 +23,8 @@
 ;; Load up the base functions for everything else
 (org-babel-load-file (concat etcw-conf-dir "base.org"))
 
+;; Load other configurations
+(load-conf (concat etcw-conf-dir "config.org"))
+
 ;; Show the Time taken to 'boot' emacs
 (message "Configurations started in %f seconds" (float-time (subtract-time (current-time) etcw-el-start-time)))
