@@ -1,0 +1,47 @@
+#+TITLE: Base
+#+AUTHOR: Evan Wilde
+#+EMAIL: etcwilde@uvic.ca
+#+PROPERTY: tangle `(concat etcw-el-root-directory "etcw/base.el")`
+
+This file is mostly for bootstrapping operations
+
+* Configurations
+
+List of configuration file types supported
+
+#+BEGIN_SRC emacs-lisp
+(setq etcw-config-file-types '())
+#+END_SRC
+
+Configuration loaders for org-mode configuration and emacs lisp
+
+#+BEGIN_SRC emacs-lisp
+(defun load-org-configuration (fname)
+    "Load an Org-mode configuration file"
+    (if (file-exists-p fname)
+    (org-babel-load-file fname)
+    (message (format "Loading %s (source) failed" fname))))
+
+(add-to-list 'etcw-config-file-types '("org", 'load-org-configuration))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(defun load-elisp-configuration (fname)
+    "Load an elisp configuration file"
+    (if (file-exists-p fname)
+    (load fname)
+    (message (format "Loading %s (source) failed" fname))))
+
+(add-to-list 'etcw-config-file-types '("org", 'load-org-configuration))
+#+END_SRC
+
+Load registered configuration files
+
+#+BEGIN_SRC emacs-lisp
+(defun load-conf(file)
+    "Load configuration file"
+    (let ((loader (assoc (file-name-extension file) etcw-config-file-types)))
+    (if loader
+    (funcall (nth 2 loader) file)
+    (message "Error: Unkown configuration type: %s" file))))
+#+END_SRC

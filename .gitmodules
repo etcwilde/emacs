@@ -1,0 +1,6 @@
+[submodule "contrib/org-mode"]
+	path = contrib/org-mode
+	url = git://orgmode.org/org-mode
+[submodule "contrib/use-package"]
+	path = contrib/use-package
+	url = https://github.com/jwiegley/use-package
