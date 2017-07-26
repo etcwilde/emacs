@@ -22,7 +22,7 @@ Configuration loaders for org-mode configuration and emacs lisp
     (org-babel-load-file fname)
     (message (format "Loading %s (source) failed" fname))))
 
-(add-to-list 'etcw-config-file-types '("org", 'load-org-configuration))
+(add-to-list 'etcw-config-file-types '("org" . 'load-org-configuration))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -32,7 +32,7 @@ Configuration loaders for org-mode configuration and emacs lisp
     (load fname)
     (message (format "Loading %s (source) failed" fname))))
 
-(add-to-list 'etcw-config-file-types '("org", 'load-org-configuration))
+(add-to-list 'etcw-config-file-types '("el" . 'load-elisp-configuration))
 #+END_SRC
 
 Load registered configuration files
