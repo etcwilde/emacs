@@ -1,0 +1,122 @@
+# -*- mode: org -*-
+# -*- coding: utf-8 -*-
+#+TITLE: Zenburn Theme
+#+AUTHOR: Evan Wilde
+#+EMAIL: etcwilde@uvic.ca
+#+CATEGORY: Theme
+
+This is my definition of the Zenburn theme using Org-mode tables to define the
+colors. The file will tangle itself if it is neccessary, so to load it, it is
+only necessary to load the `zenburn.org` file.
+
+
+* Tangle
+
+Tangle this file only if it needs to be
+
+#+BEGIN_SRC emacs-lisp
+(if (or (not (file-exists-p "~/.emacs.d/themes/zenburn-theme.el"))
+      (file-newer-than-file-p "~/.emacs.d/etcw/themes/zenburn.org"
+                              "~/.emacs.d/themes/zenburn-theme.el"))
+
+    (progn (message "Need to update Zenburn theme")
+           (org-babel-tangle-file "~/.emacs.d/etcw/themes/zenburn.org" "~/.emacs.d/themes/zenburn-theme.el"))
+    (message "Zenburn theme is fine"))
+#+END_SRC
+
+* Color Definitions
+
+#+NAME: Color-Definitions
+| Name     | Value     |
+|----------+-----------|
+| fg       | "#dcdccc" |
+| bg-1     | "#282828" |
+| bg       | "#3f3f3f" |
+| bg+1     | "#4f4f4f" |
+| bg+2     | "#5f5f5f" |
+| red+1    | "#dca3a3" |
+| red      | "#cc9393" |
+| red-1    | "#bc8383" |
+| red-2    | "#ac7373" |
+| red-3    | "#9c6363" |
+| red-4    | "#8c5353" |
+| orange   | "#dfaf8f" |
+| orange+1 | "#ffc9a4" |
+| yellow   | "#f0dfaf" |
+| yellow-1 | "#e0cf9f" |
+| yellow-2 | "#d0bf8f" |
+| green-1  | "#5f7f5f" |
+| green    | "#7f9f7f" |
+| green+1  | "#8fb28f" |
+| green+2  | "#9fc59f" |
+| green+3  | "#afd8af" |
+| green+4  | "#bfebbf" |
+| cyan     | "#93e0e3" |
+| blue+1   | "#94bff3" |
+| blue     | "#8cd0d3" |
+| blue-1   | "#7cb8bb" |
+| blue-2   | "#6ca0a3" |
+| blue-3   | "#5c888b" |
+| blue-4   | "#4c7073" |
+| magenta  | "#dc8cc3" |
+
+The table above defines the variable name for the color, and the color itself.
+
+#+Name: Colors
+#+BEGIN_SRC emacs-lisp :var table=Color-Definitions
+(dolist (row table) (set (intern (car row)) (car (cdr row))))
+#+END_SRC
+
+* Theme Definition
+
+Actually define the theme color associations
+
+#+BEGIN_SRC emacs-lisp :var zenburn-default-colors-alist=Color-Definitions
+
+(deftheme zenburn
+    "Low-contrast dark background with a tint of Alien salad. Great
+    for navigating the matrix")
+
+(let ((class '((class color) (min-colors 89))))
+  (custom-theme-set-faces
+   'zenburn
+   ;; Basic Colors
+   `(default ((,class (:foreground ,fg :background ,bg))))
+   `(trailing-whitespace ((,class (:background ,red-2))))
+   ;; Interface Colors
+   `(cursor ((,class (:background ,fg))))
+   `(region ((,class (:background ,bg-1))))
+   `(fringe ((,class (:background ,bg+1))))
+   `(link ((,class (:underline t :foreground ,cyan :weight bold))))
+   `(link-visited ((,class (:underline t :foreground ,magenta))))
+   `(mode-line ((,class ((:box (:line-width -1 :color nil :style released-button) :foreground ,red-1 :background ,bg+1)))))
+   `(mode-line-buffer-id ((,class (:weight bold :foreground ,green))))
+   `(mode-line-emphasis ((,class (:weight bold :background ,red-3))))
+   `(mode-line-highlight ((,class (:weight bold :background ,red :foreground ,fg))))
+   `(mode-line-inactive ((,class (:slant italic :foreground ,bg+2 :background ,fg))))
+   ;; Font Colors
+   `(font-lock-builtin-face ((,class (:foreground ,yellow-1))))
+   `(font-lock-function-name-face ((,class (:foreground ,yellow))))
+   `(font-constant-face ((,class (:weight bold :foreground ,blue))))
+   `(font-lock-comment-face ((,class (:slant italic :foreground ,green))))
+   `(font-lock-comment-delimiter-face ((,class (:inherit (font-lock-comment-face)))))
+   `(font-lock-doc-face ((,class (:weight bold :foreground ,green+1))))
+   `(font-lock-string-face ((,class (:foreground ,red-1))))
+   ;; Search
+   `(isearch ((,class (:foreground ,bg-1 :background ,yellow))))
+   `(isearch-fail ((,class (:foreground ,bg :background ,red-1))))
+   `(lazy-highlight ((,class (:foreground ,bg-1 :background ,yellow-2))))
+   `(query-replace ((,class (:inherit (isearch)))))
+   `(next-error ((,class (:background ,red))))
+   ;; Company
+   `(company-tooltip ((,class (:inherit default :background ,bg+1))))
+   `(company-scrollbar-bg ((,class (:background ,bg+2))))
+   `(company-scrollbar-fg ((,class (:background ,bg+1))))
+   `(company-tooltip-selection ((,class (:inherit font-lock-function-name-face))))
+   `(company-tooltip-common ((,class (:inherit font-lock-constant-face))))
+   ))
+(provide-theme 'zenburn)
+#+END_SRC
+
+#+RESULTS:
+: zenburn-theme
