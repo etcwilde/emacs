@@ -5,11 +5,11 @@
 #+EMAIL: etcwilde@uvic.ca
 #+DRAWERS: HIDDEN STATE
 #+CATEGORY: Configuration
-#+PROPERTY: tangle `(concat etcw-el-root-directory "etcw/config.el")`
+#+PROPERTY: tangle `(concat etcw-conf-dir "config.el")`
 #+PROPERTY: header-args:C++ :results output :flags -std=c++14 -Wall --pedantic -Werror
 #+PROPERTY: header-args:R   :results output :colnames yes
 
-This file is for personal configuratoin
+This file is for personal configuration
 
 * Environment Behaviour
 
@@ -19,21 +19,74 @@ Prefer y-n versus yes-no
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
-Disable bell
+Hide bells and whistles
 
 #+BEGIN_SRC emacs-lisp
-(setq visible-bell t)
+(setq ring-bell-function 'ignore)
+(setq inhibit-startup-screen t
+      initial-scratch-message nil)
+
+(disable-modes '(menu-bar-mode
+                 tool-bar-mode
+                 scroll-bar-mode))
+(enable-modes '(abbrev-mode
+                column-number-mode
+                delete-selection-mode))
 #+END_SRC
 
-Disable spash screen
+Highlight matching parenthesis
 
 #+BEGIN_SRC emacs-lisp
-(setq inhibit-startup-screen t)
+(setq show-paren-delay 0.25)
+(show-paren-mode t)
+#+END_SRC
+
+Put the autosaves in a separate directory
+#+BEGIN_SRC emacs-lisp
+(defvar emacs-autosave-dir
+    (concat user-emacs-directory "autosaves/")
+    "Dictates where to put autosave files")
+
+(setq backup-directory-alist
+    `((".*" . ,emacs-autosave-dir))
+    auto-save-file-name-transforms
+    `((".*" ,emacs-autosave-dir t)))
+#+END_SRC
+
+Add hooks
+
+#+BEGIN_SRC emacs-lisp
+(add-hook
+  'after-init-hook
+  'global-company-mode)
 #+END_SRC
 
 * Text Editing Configuration
 
 End sentences with a single space
+
 #+BEGIN_SRC emacs-lisp
 (setq sentence-end-double-space nil)
+#+END_SRC
+
+Set basic properties for all buffers
+
+Sets width, line-wrappting, use spaces instead of tabs, and how the buffers will split.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default fill-column 79
+              truncate-lines t
+	      indent-tabs-mode nil
+	      split-width-threshold 160
+	      split-height-threshold nil
+	      auto-fill-function 'do-auto-fill)
+#+END_SRC
+
+Narrowing a region is pretty cool, but can be confusing.
+
+`C-x n n` will narrow to the selected region
+`C-x n w` will widen to show the whole region again
+
+#+BEGIN_SRC emacs-lisp
+(put 'narrow-to-region 'disabled nil)
 #+END_SRC

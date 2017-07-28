@@ -7,12 +7,11 @@
 ;; Log starting time
 (defvar etcw-el-start-time (current-time) "Time when init.el was started")
 
-;; Root filepath
-(defvar emacs-conf-dir "~/.emacs.d/" "Root configuration Directory")
-(defvar etcw-conf-dir (concat emacs-conf-dir "etcw/") "My configurations")
-
-;; (package-initialize)
-;; (setq package-enable-at-startup nil)"
+;; Custom configurations
+(defvar emacs-conf-dir user-emacs-directory "Root configuration directory for emacs")
+(defvar etcw-conf-dir (concat user-emacs-directory "etcw/") "My configurations")
+(if (not (member "~/.emacs.d/themes" 'custom-theme-load-path))
+    (add-to-list 'custom-theme-load-path "~/.emacs.d/themes"))
 
 ;; Set paths to org-mode
 ;; Different version of org-mode, not elpa
@@ -23,8 +22,21 @@
 ;; Load up the base functions for everything else
 (org-babel-load-file (concat etcw-conf-dir "base.org"))
 
+;; Load private personal settings
+(add-hook
+ 'after-init-hook
+ (lambda ()
+   (let ((private-file (concat emacs-conf-dir "private.el")))
+     (when (file-exists-p private-file)
+       (load-file private-file)))))
+
 ;; Load other configurations
-(load-conf (concat etcw-conf-dir "config.org"))
+(load-conf (concat etcw-conf-dir "functions.org")) ;; Helper functions
+(load-conf (concat etcw-conf-dir "themes/zenburn.org")) ;; Zenburn theme
+(load-conf (concat etcw-conf-dir "config.org"))    ;; Personal settings
+
 
 ;; Show the Time taken to 'boot' emacs
-(message "Configurations started in %f seconds" (float-time (subtract-time (current-time) etcw-el-start-time)))
+(message "Configurations started in %f seconds" (float-time (subtract-time
+                                                             (current-time)
+                                                             etcw-el-start-time)))
