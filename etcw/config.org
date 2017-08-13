@@ -32,6 +32,9 @@ Hide bells and whistles
 (enable-modes '(abbrev-mode
                 column-number-mode
                 delete-selection-mode))
+
+(hook-modes '(global-company-mode
+              global-linum-mode))
 #+END_SRC
 
 Highlight matching parenthesis
@@ -51,14 +54,6 @@ Put the autosaves in a separate directory
     `((".*" . ,emacs-autosave-dir))
     auto-save-file-name-transforms
     `((".*" ,emacs-autosave-dir t)))
-#+END_SRC
-
-Add hooks
-
-#+BEGIN_SRC emacs-lisp
-(add-hook
-  'after-init-hook
-  'global-company-mode)
 #+END_SRC
 
 * Text Editing Configuration

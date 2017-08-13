@@ -13,13 +13,17 @@ These functions are for enabling and disabling lists of modes
 
 #+BEGIN_SRC emacs-lisp
 (defun enable-modes (list)
-  "Enables the modes in the list"
+  "Enables the modes in the `list'"
   (dolist (mode list)
-  (funcall mode 1)))
+    (funcall mode 1)))
 
 (defun disable-modes (list)
-  "Disables the modes in the list"
+  "Disables the modes in `list'"
   (dolist (mode list)
-  (funcall mode 0)))
+    (funcall mode 0)))
 
+(defun hook-modes (list)
+  "Adds an `after-init' hook to each of the modes in `list'"
+  (dolist (mode list)
+    (add-hook 'after-init-hook mode)))
 #+END_SRC
