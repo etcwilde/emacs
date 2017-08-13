@@ -71,10 +71,10 @@ Sets width, line-wrappting, use spaces instead of tabs, and how the buffers will
 #+BEGIN_SRC emacs-lisp
 (setq-default fill-column 79
               truncate-lines t
-	      indent-tabs-mode nil
-	      split-width-threshold 160
-	      split-height-threshold nil
-	      auto-fill-function 'do-auto-fill)
+              indent-tabs-mode nil
+              split-width-threshold 160
+              split-height-threshold nil
+              auto-fill-function 'do-auto-fill)
 #+END_SRC
 
 Narrowing a region is pretty cool, but can be confusing.
