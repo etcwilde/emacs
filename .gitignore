@@ -1,7 +1,16 @@
 # Automatically created files
 *.*~
-base.el
-config.el
+etcw/base.el
+etcw/config.el
+etcw/functions.el
+etcw/themes/zenburn.el
+.org-id-locations
 
 # Auto-created directories
-auto-save-list
+auto-save-list/
+autosaves/
+eshell/
+elpa/
+
+# My own stuff
+private.el
