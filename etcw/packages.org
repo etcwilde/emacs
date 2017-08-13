@@ -1,0 +1,64 @@
+# -*- mode: org -*-
+# -*- coding: utf-8 -*-
+#+TITLE: Packaging
+#+AUTHOR: Evan Wilde
+#+EMAIL: etcwilde@uvic.ca
+#+DRAWERS: HIDDEN STATE
+#+CATEGORY: Configuration
+#+PROPERTY: tangle `(concat etcw-conf-dir "packages.el")`
+
+This is for package management
+
+#+BEGIN_SRC emacs-lisp :results silent
+(require 'cl)
+(require 'package)
+
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
+(package-initialize)
+#+END_SRC
+
+* Package List
+
+This is the list of packages that I am using.
+
+#+Name: Package-list
+- company
+- define-word
+- expand-region
+- focus
+- git-gutter-fringe
+- idle-require
+- helm
+- helm-ag
+- helm-company
+- helm-dash
+- helm-projectile
+- jedi
+- magit
+- markdown-mode
+- org-ref
+- paredit
+- pdf-tools
+- projectile
+- slime
+- which-key
+- rainbow-mode
+
+* Package Installation
+
+This installs any packages that are not installed in the list automatically.
+
+#+BEGIN_SRC emacs-lisp :var packages=Package-list :results silent
+(let ((packages (remove-if 'package-installed-p
+                        (mapcar
+                         (lambda (x) (intern (car x)))
+                         packages))))
+  (when packages
+    (package-refresh-contents)
+    (dolist (package packages)
+      (package-install package))))
+#+END_SRC
+
+I sitll need to fill in the `package-selected-packages` variable from the list
+of packages.

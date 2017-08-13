@@ -4,6 +4,8 @@
 ;; Date:    July 17, 2017
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;(package-initialize) -- handled by packages.org
+
 ;; Log starting time
 (defvar etcw-el-start-time (current-time) "Time when init.el was started")
 
@@ -36,15 +38,10 @@
 ;; Load other configurations
 (load-conf (concat etcw-conf-dir "functions.org")) ;; Helper functions
 (load-conf (concat etcw-conf-dir "themes/zenburn.org")) ;; Zenburn theme
+(load-conf (concat etcw-conf-dir "packages.org"))  ;; Package Management
 (load-conf (concat etcw-conf-dir "config.org"))    ;; Personal settings
 
 ;; Show the Time taken to 'boot' emacs
 (message "Configurations started in %f seconds" (float-time (subtract-time
                                                              (current-time)
                                                              etcw-el-start-time)))
-;; TODO: Replace package management with a separate file
-(custom-set-variables
- '(package-selected-packages
-   (quote
-    (ess with-editor magit helm define-word rainbow-mode company))))
-(custom-set-faces)

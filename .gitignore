@@ -3,6 +3,7 @@
 etcw/base.el
 etcw/config.el
 etcw/functions.el
+etcw/packages.el
 etcw/themes/zenburn.el
 .org-id-locations
 
