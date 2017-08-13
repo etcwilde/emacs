@@ -19,6 +19,9 @@
 (add-to-list 'load-path (concat emacs-conf-dir "contrib/org-mode/contrib/lisp/"))
 (require 'org)
 
+;; Set paths to use-package
+(add-to-list 'load-path (concat emacs-conf-dir "contrib/use-package/"))
+
 ;; Load up the base functions for everything else
 (org-babel-load-file (concat etcw-conf-dir "base.org"))
 
@@ -35,8 +38,13 @@
 (load-conf (concat etcw-conf-dir "themes/zenburn.org")) ;; Zenburn theme
 (load-conf (concat etcw-conf-dir "config.org"))    ;; Personal settings
 
-
 ;; Show the Time taken to 'boot' emacs
 (message "Configurations started in %f seconds" (float-time (subtract-time
                                                              (current-time)
                                                              etcw-el-start-time)))
+;; TODO: Replace package management with a separate file
+(custom-set-variables
+ '(package-selected-packages
+   (quote
+    (ess with-editor magit helm define-word rainbow-mode company))))
+(custom-set-faces)
