@@ -71,7 +71,7 @@ The table above defines the variable name for the color, and the color itself.
 
 Actually define the theme color associations
 
-#+BEGIN_SRC emacs-lisp :var zenburn-default-colors-alist=Color-Definitions
+#+BEGIN_SRC emacs-lisp :var zenburn-default-colors-alist=Color-Definitions :results silent
 
 (deftheme zenburn
     "Low-contrast dark background with a tint of Alien salad. Great

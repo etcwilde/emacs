@@ -23,7 +23,36 @@ This is for package management
 This is the list of packages that I am using.
 
 #+Name: Package-list
+- auctex
+- cmake-mode
 - company
+- company-go
+- company-jedi
+- company-rtags
+- define-word
+- expand-region
+- focus
+- flycheck
+- flyspell
+- git-gutter-fringe
+- go-mode
+- idle-require
+- helm
+- helm-ag
+- helm-company
+- helm-dash
+- helm-projectile
+- jedi
+- magit
+- markdown-mode
+- org-ref
+- paredit
+- pdf-tools
+- projectile
+- slime
+- which-key
+- rainbow-mode
+- rtags
 - define-word
 - expand-region
 - focus
@@ -44,6 +73,9 @@ This is the list of packages that I am using.
 - slime
 - which-key
 - rainbow-mode
+- rtags
+- spaceline
+- spaceline-all-the-icons
 
 * Package Installation
 
@@ -60,5 +92,5 @@ This installs any packages that are not installed in the list automatically.
       (package-install package))))
 #+END_SRC
 
-I sitll need to fill in the `package-selected-packages` variable from the list
+I still need to fill in the `package-selected-packages` variable from the list
 of packages.

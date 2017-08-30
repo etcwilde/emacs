@@ -9,43 +9,100 @@
 #+PROPERTY: header-args:C++ :results output :flags -std=c++14 -Wall --pedantic -Werror
 #+PROPERTY: header-args:R   :results output :colnames yes
 
-This file is for personal configuration
+This is the primary file for configurations. The other files are primarily
+intended for installing packages and bootstrapping purposes.
+
+Personal Information
+
+#+BEGIN_SRC emacs-lisp :results silent
+(setq
+ user-fill-name "Evan Wilde"
+ user-email-address "etcwilde@uvic.ca")
+#+END_SRC
 
 * Environment Behaviour
 
+Basic behaviour configurations
+
+#+BEGIN_SRC emacs-lisp :results silent
+(setq-default
+  cursor-in-non-selected-windows t                ; Show cursor in unfocused windows
+ display-time-default-load-average nil           ; Don't show load average
+ display-time-format "%H:%M"                     ; Custom time format
+ fill-column 79                                  ; text width before auto line-break
+ help-window-select t                            ; focus help window
+ indent-tabs-mode nil                            ; use spaces instead of tabs
+ inhibit-startup-screen t                        ; don't show startup screen
+ initial-scratch-message ""                      ; Empty *scratch* buffer
+ left-margin-width 1
+ right-margin-width 0
+ ring-bell-function 'ignore                      ; No bell
+ scroll-conservatively most-positive-fixnum      ; scroll by one line
+ scroll-margin 5                                 ; Scroll offset
+ select-enable-clipboard t                       ; use system clipboard
+ sentence-end-double-space nil                   ; one space between sentences
+ show-trailing-whitespace t                      ; show trailing whitespaces
+ tab-width 2                                     ; set tab width
+ truncate-lines t                                ; disable truncate lines
+ uniquify-buffer-name-style 'forward             ; Make buffer names unique
+ visible-bell nil                                ; No visible bell
+ window-combination-requize t                    ; Resize windows propotionately
+ x-stretch-cursor t                              ; Use glyph width for cursor
+ show-paren-delay 0.1)                           ; delay before showing parenthesis
+#+END_SRC
+
 Prefer y-n versus yes-no
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :results silent
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
-Hide bells and whistles
+Hooked Modes
 
-#+BEGIN_SRC emacs-lisp
-(setq ring-bell-function 'ignore)
-(setq inhibit-startup-screen t
-      initial-scratch-message nil)
+#+NAME: Hooked-Modes
+- global-hl-line-mode
+- global-company-mode
+- global-linum-mode
+- global-git-gutter-mode
 
-(disable-modes '(menu-bar-mode
-                 tool-bar-mode
-                 scroll-bar-mode))
-(enable-modes '(abbrev-mode
-                column-number-mode
-                delete-selection-mode))
+Enabled modes
+#+NAME: Enabled-Modes
+- delete-selection-mode
+- column-number-mode
+- flyspell-mode
 
-(hook-modes '(global-company-mode
-              global-linum-mode))
+Disabled modes
+#+NAME: Disabled-Modes
+- menu-bar-mode
+- tool-bar-mode
+- scroll-bar-mode
+
+#+BEGIN_SRC emacs-lisp :results silent :var hooked-modes=Hooked-Modes disabled-modes=Disabled-Modes enabled-modes=Enabled-Modes
+
+(let ((modes (mapcar (lambda (x) (intern (car x))) hooked-modes)))
+  (when modes
+    (hook-modes modes)))
+
+(let ((modes (mapcar (lambda (x) (intern (car x))) disabled-modes)))
+  (when modes
+    (disable-modes modes)))
+
+(let ((modes (mapcar (lambda (x) (intern (car x))) enabled-modes)))
+  (when modes
+    (enable-modes modes)))
+
+(global-flycheck-mode)
 #+END_SRC
 
 Highlight matching parenthesis
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :results silent
 (setq show-paren-delay 0.25)
 (show-paren-mode t)
 #+END_SRC
 
 Put the autosaves in a separate directory
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :results silent
 (defvar emacs-autosave-dir
     (concat user-emacs-directory "autosaves/")
     "Dictates where to put autosave files")
@@ -56,26 +113,279 @@ Put the autosaves in a separate directory
     `((".*" ,emacs-autosave-dir t)))
 #+END_SRC
 
+Helm
+
+#+BEGIN_SRC emacs-lisp :results silent
+
+(require 'helm)
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(global-unset-key (kbd "C-x c"))
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+(define-key helm-map (kbd "C-i") 'helm-execute-persisten-action)
+(define-key helm-map (kbd "C-z") 'helm-selection-action)
+
+(when (executable-find "curl")
+  (setq helm-google-suggest-use-curl-p t))
+
+(setq helm-split-window-in-side-p       t
+      helm-move-to-line-cycle-in-source t
+      helm-ff-search-library-in-sexp    t
+      helm-scroll-amount                8
+      helm-ff-file-name-history-use-recentf t
+      helm-echo-input-in-header-line t
+      helm-M-x-fuzzy-match t
+      helm-buffers-fuzzy-matching t
+      helm-recentf-fuzzy-matching t
+      helm-semantic-fuzzy-match t
+      helm-imenu-fuzzy-match t)
+
+(global-set-key (kbd "C-x b") 'helm-mini)
+(global-set-key (kbd "C-x C-b") 'helm-mini)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
+
+(helm-mode 1)
+#+END_SRC
+
+** Auto-completion
+
+#+BEGIN_SRC elisp :results silent
+(use-package company
+             :init
+             (add-hook 'after-init-hook #'global-company-mode)
+             :config
+             (setq
+              company-idle-delay 0.001
+              company-minimum-prefix-length 1
+              company-tooltip-align-annotation t))
+#+END_SRC
+
+
+** Code Expansion
+
+#+BEGIN_SRC elisp :results silent
+(use-package hippie-exp
+  :ensure nil
+  :bind
+  ("<C-return>" . hippie-expand))
+#+END_SRC
+
+** Help
+
+#+BEGIN_SRC elisp :results slient
+(use-package help-mode
+  :ensure nil
+  :bind
+  (:map help-mode-map
+        ("q" . kill-buffer-and-window)
+        ("<" . help-go-back)
+        (">" . help-go-forward)))
+#+END_SRC
+
+** Definition Jumping
+
+#+BEGIN_SRC elisp :results silent
+(use-package dumb-jump
+  :bind(([f12] . dumb-jump-go)
+        ("C-M-S-g" . dumb-jump-go-prefer-external-other-window))
+  :config
+  (dumb-jump-mode 1))
+#+END_SRC
+
+** Search and Replace
+
+Anzu search and replace configuration
+
+#+BEGIN_SRC elisp :results silent
+(use-package anzu
+  :bind ([remap query-replace] . anzu-query-replace-regexp)
+  :config
+  (global-anzu-mode)
+  (setq-default
+   anzu-cons-mode-line-p nil))
+#+END_SRC
+
+Some addition stuff for isearch
+
+#+BEGIN_SRC elisp :results silent
+(use-package isearch
+  :ensure nil
+  :bind(("C-S-r" . isearch-backward-regexp)
+        ("C-S-s" . isearch-forward-regexp)
+        :map isearch-mode-map
+        ("<M-down>" . isearch-ring-advance)
+        ("<M-up>" . isearch-ring-retreat)
+        :map minibuffer-local-isearch-mapcar
+        ("<M-down>" . next-history-element)
+        ("<M-up>" . previous-history-element))
+  :init
+  (setq-defaulthk
+   isearch-allow-scroll t
+   lazy-highlight-cleanup nil
+   lazy-highlight-initial-delay 0))
+#+END_SRC
+
+** Parentheses
+
+#+BEGIN_SRC elisp :results silent
+
+(use-package show-paren-mode
+  :ensure nil
+  :init
+  (show-paren-mode t))
+
+(use-package rainbow-delimiters
+  :init
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+#+END_SRC
+
+Use smart parentheses tool
+
+#+BEGIN_SRC elisp :results silent
+
+(use-package smartparens
+  :bind
+  (("M-<backspace>" . sp-unwrap-sexp)
+   ("M-<left>" . sp-forward-barf-sexp)
+   ("M-<right>" . sp-forward-slurp-sexp)
+   ("M-S-<left>" . sp-backward-slurp-sexp)
+   ("M-S-<right>" . sp-backward-barf-sexp)))
+
+(use-package smartparens-config
+  :ensure nil
+  :after smartparens
+  :config
+  (smartparens-global-mode)
+  (sp-pair "{{" "}}")
+  (sp-pair "[[" "]]"))
+#+END_SRC
+
+** Spell Checking
+
+Generate the arguments for the appropriate command.
+Use aspell if it's installed, otherwise use hunspell.
+#+BEGIN_SRC elisp :results silent
+(defun flyspell-detect-ispell-args (&optional run-together)
+  "if RUN-TOGETHER is true, spell check the CamelCase words."
+  (let (args)
+    (cond
+     ((string-match  "aspell$" ispell-program-name)
+      ;; Force the English dictionary for aspell
+      ;; Support Camel Case spelling check (tested with aspell 0.6)
+      (setq args (list "--sug-mode=ultra" "--lang=en_US"))
+      (if run-together
+          (setq args (append args '("--run-together" "--run-together-limit=5" "--run-together-min=2")))))
+     ((string-match "hunspell$" ispell-program-name)
+      ;; Force the English dictionary for hunspell
+      (setq args "-d en_US")))
+    args))
+#+END_SRC
+
+Choosing a spell checker. We'll use aspell first if it exists, otherwise fall back on hunspell.
+
+#+BEGIN_SRC elisp :results silent
+(cond
+ ((executable-find "aspell")
+  (setq ispell-program-name "aspell"))
+ ((executable-find "hunspell")
+  (setq ispell-program-name "hunspell")
+  (setq ispell-local-dictionary "en_US")
+  (setq ispell-local-dictionary-alist
+        '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))))
+#+END_SRC
+
+Final configurations before calling ispell
+
+#+BEGIN_SRC elisp :results silent
+(setq-default ispell-extra-args (flyspell-detect-ispell-args t))
+(defadvice ispell-word (around my-ispell-word activate)
+  (let ((old-ispell-extra-args ispell-extra-args))
+    (ispell-kill-ispell t)
+    (setq ispell-extra-args (flyspell-detect-ispell-args))
+    ad-do-it
+    (setq ispell-extra-args odl-ispell-extra-args)
+    (ispell-kill-ispell t)))
+(defadvice flyspell-auto-correct-word (around my-flyspell-auto-correct-word activate)
+  (let ((old-ispell-extra-args ispell-extra-args))
+    (ispell-kill-ispell t)
+    (setq ispell-extra-args (flyspell-detect-ispell-args))
+    ad-do-it
+    (setq ispell-extra-args old-ispell-extra-args)
+    (ispell-kill-ispell t)))
+#+END_SRC
+
+Configure and hook
+
+#+BEGIN_SRC elisp :results silent
+(add-hook 'text-mode-hook (lambda () (setq-local ispell-extra-args (flyspell-detect-ispell-args))))
+(add-hook 'org-mode-hook (lambda () (setq-local ispell-extra-args (flyspell-detect-ispell-args))))
+#+END_SRC
+
+Toggle spell check
+#+BEGIN_SRC elisp :results silent
+(global-set-key (kbd "C-c s") 'flyspell-mode)
+#+END_SRC
+
+* Mode Line
+
+Rename major/minor modes to be more compact.
+
+#+BEGIN_SRC elisp :results silent
+(use-package delight
+  :ensure nil
+  :config
+  (defadvice powerline-major-mode (around delight-powerline-major-mode activate)
+    (let ((inhibit-mode-name-delight nil)) ad-do-it)))
+#+END_SRC
+
+Use icons on the modeline
+#+BEGIN_SRC elisp :results silent
+(use-package all-the-icons
+  :after spaceline)
+#+END_SRC
+
+
+** Spaceline
+
+Replace the modeline with something prettier
+
+#+BEGIN_SRC elisp :results silent
+(use-package spaceline
+  :init
+  (require 'spaceline-config)
+  (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
+#+END_SRC
+
+Define Spaceline segments:
+
+#+BEGIN_SRC elisp :results silent
+;; Programatically put faces on segments
+(defmacro with-face (STR &rest PROPS)
+  "Return STR propertized with PROPS."
+  `(propertize ,STR 'face (list ,@PROPS)))
+#+END_SRC
+
+Configurations
+
+#+BEGIN_SRC elisp :results silent
+(setq
+ powerline-default-separator 'arrow
+ powerline-height 20
+ spaceline-highlight-face-func 'spaceline-highlight-face-modified
+ spaceline-separator-dir-left '(left . left)
+ spaceline-separator-dir-right '(right.right))
+
+(spaceline-install'((major-mode :face highlight-face))
+                  '((anzu :when active)
+                    (selection-info :when mark-active)
+                    ((flycheck-error flycheck-info flycheck-warning))
+                    (projectile-root)
+                    (line-column)
+                    ((hud buffer-position))))
+#+END_SRC
+
 * Text Editing Configuration
-
-End sentences with a single space
-
-#+BEGIN_SRC emacs-lisp
-(setq sentence-end-double-space nil)
-#+END_SRC
-
-Set basic properties for all buffers
-
-Sets width, line-wrappting, use spaces instead of tabs, and how the buffers will split.
-
-#+BEGIN_SRC emacs-lisp
-(setq-default fill-column 79
-              truncate-lines t
-              indent-tabs-mode nil
-              split-width-threshold 160
-              split-height-threshold nil
-              auto-fill-function 'do-auto-fill)
-#+END_SRC
 
 Narrowing a region is pretty cool, but can be confusing.
 
@@ -85,19 +395,122 @@ Narrowing a region is pretty cool, but can be confusing.
 #+BEGIN_SRC emacs-lisp
 (put 'narrow-to-region 'disabled nil)
 #+END_SRC
+
+* Language Support
+
+** Go
+
+#+BEGIN_SRC elisp :results silent
+(defun configure-Go()
+  "Configure the environment for Go"
+  (progn
+    (print "Configuring for Go")
+    (setq tab-width 2)))
+
+(defun etcw-go-mode-hook ()
+  "Handle Everything for working with go"
+  (progn
+    (use-package company)
+    (print "Configuring Go mode")
+    (use-package company-go
+      :config
+      (set (make-local-variable 'company-backends) '(company-go)))
+                                        ; set compiler to go compiler
+    ;; (if (not (string-match "go" 'compile-command))
+    ;; "go build -v && go test -v && go vet")
+                                        ; Godef jump key bindings
+    (local-set-key (kbd "M-.") 'godef-jump)
+    (local-set-key (kbd "M-*") 'pop-tag-mark)
+    (print "Go-mode Configured")))
+
+
+(add-hook 'go-mode-hook 'etcw-go-mode-hook)
+#+END_SRC
+
+** LaTeX
+
+#+BEGIN_SRC emacs-lisp :results silent
+(defun configure-LaTeX()
+  "Configures the environment for LaTeX"
+  (progn
+    (print "Configuring for LaTeX")
+    (setq TeX-auto-save t)
+    (setq TeX-parse-self t)
+    (setq TeX-master nil)))
+(add-hook 'LaTeX-mode-hook 'configure-LaTeX)
+(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+(setq reftex-plug-into-AUCTeX t)
+
+; Fixing TeX checking for Linux
+(defun flymake-get-tex-args (file-name)
+    (list "pdflatex" (list "-file-line-error" "-draftmode" "-interaction=nonstopmode" file-name)))
+#+END_SRC
+
+** C/C++
+
+#+BEGIN_SRC emacs-lisp :results silent
+(defun configure-c()
+  "Configure the environment for C"
+  (progn
+    (print "Configuring for c")
+    (require 'rtags)
+    (require 'company-rtags)
+    (setq rtags-completeions-enabled t)
+    (eval-after-load 'company
+      '(add-to-list
+        'company-backend 'company-rtags))
+    (setq rtags-autostart-diagnistics t)
+    (rtags-enable-standard-keybindings)))
+
+(defun configure-c++()
+  "Configure the environment for C++"
+  (progn
+    (print "Configuring for c++")
+    (require 'rtags)
+    (require 'company-rtags)
+    (setq rtags-completeions-enabled t)
+    (eval-after-load 'company
+      '(add-to-list
+        'company-backend 'company-rtags))
+    (setq rtags-autostart-diagnistics t)
+    (rtags-enable-standard-keybindings)))
+
+(add-hook 'c-mode 'configure-c)
+(add-hook 'c++-mode 'configure-c++)
+#+END_SRC
+
+** Python
+
+#+BEGIN_SRC elisp :results silent
+(defun etcw-python-mode-hook ()
+  "Configure emacs for python"
+  (progn
+    (use-package company)
+    (add-to-list 'company-backends 'company-jedi)))
+
+(add-hook 'python-mode-hook 'etcw-python-mode-hook)
+
+#+END_SRC
+
 * Org-mode languages
 
 Initialize languages to use in org-mode
 
 #+BEGIN_SRC emacs-lisp
 (org-babel-do-load-languages
-   'org-babel-load '((emacs-lisp . t)
+   'org-babel-load-languages '((emacs-lisp . t)
                      (sqlite . t)
+                     (sql . t)
                      (R . t)
                      (python . t)
-                     (C++ . t)
                      (C . t)))
 #+END_SRC
+
+#+RESULTS:
 
 Org-mode code block behaviour
 

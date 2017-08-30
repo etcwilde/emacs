@@ -23,6 +23,7 @@
 
 ;; Set paths to use-package
 (add-to-list 'load-path (concat emacs-conf-dir "contrib/use-package/"))
+(require 'use-package)
 
 ;; Load up the base functions for everything else
 (org-babel-load-file (concat etcw-conf-dir "base.org"))
@@ -40,6 +41,7 @@
 (load-conf (concat etcw-conf-dir "themes/zenburn.org")) ;; Zenburn theme
 (load-conf (concat etcw-conf-dir "packages.org"))  ;; Package Management
 (load-conf (concat etcw-conf-dir "config.org"))    ;; Personal settings
+(load-conf (concat emacs-conf-dir "company-complete-cycle.el")) ;; Change company behaviour
 
 ;; Show the Time taken to 'boot' emacs
 (message "Configurations started in %f seconds" (float-time (subtract-time
